@@ -7,7 +7,12 @@
     "lambda-multipart-parser": "^1.0.1",
     "jspdf": "^2.5.1",
     "docx": "^8.5.0",
-    "html-pdf-node": "^1.0.8"
+    "html-pdf-node": "^1.0.8",
+    "@google/generative-ai": "^0.21.0",
+    "cheerio": "^1.0.0",
+    "axios": "^1.7.7",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.8.0"
   }
 }
 
