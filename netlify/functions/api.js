@@ -50,7 +50,7 @@ const advancedResumeOptimizer = {
     }
 
     // Extract key responsibilities
-    const responsibilities = this.extractResponsibilities(jobDescription);
+    const responsibilities = advancedResumeOptimizer.extractResponsibilities(jobDescription);
 
     return {
       technicalSkills,
@@ -59,7 +59,7 @@ const advancedResumeOptimizer = {
       educationRequired,
       industry,
       responsibilities,
-      jobTitle: this.extractJobTitle(jobDescription)
+      jobTitle: advancedResumeOptimizer.extractJobTitle(jobDescription)
     };
   },
 
@@ -122,42 +122,42 @@ const advancedResumeOptimizer = {
     const experienceEntries = [];
     
     // Current/Recent position
-    const currentTitle = this.generateJobTitle(jobTitle, 'senior');
-    const currentCompany = this.generateCompanyName(industry);
+    const currentTitle = advancedResumeOptimizer.generateJobTitle(jobTitle, 'senior');
+    const currentCompany = advancedResumeOptimizer.generateCompanyName(industry);
     const currentDuration = `2022 - Present`;
     
     experienceEntries.push({
       title: currentTitle,
       company: currentCompany,
       duration: currentDuration,
-      achievements: this.generateAchievements(technicalSkills, responsibilities, 'senior')
+      achievements: advancedResumeOptimizer.generateAchievements(technicalSkills, responsibilities, 'senior')
     });
 
     // Previous position
     if (yearsRequired >= 3) {
-      const previousTitle = this.generateJobTitle(jobTitle, 'mid');
-      const previousCompany = this.generateCompanyName(industry);
+      const previousTitle = advancedResumeOptimizer.generateJobTitle(jobTitle, 'mid');
+      const previousCompany = advancedResumeOptimizer.generateCompanyName(industry);
       const previousDuration = `2020 - 2022`;
       
       experienceEntries.push({
         title: previousTitle,
         company: previousCompany,
         duration: previousDuration,
-        achievements: this.generateAchievements(technicalSkills, responsibilities, 'mid')
+        achievements: advancedResumeOptimizer.generateAchievements(technicalSkills, responsibilities, 'mid')
       });
     }
 
     // Entry level position
     if (yearsRequired >= 5) {
-      const entryTitle = this.generateJobTitle(jobTitle, 'junior');
-      const entryCompany = this.generateCompanyName(industry);
+      const entryTitle = advancedResumeOptimizer.generateJobTitle(jobTitle, 'junior');
+      const entryCompany = advancedResumeOptimizer.generateCompanyName(industry);
       const entryDuration = `2018 - 2020`;
       
       experienceEntries.push({
         title: entryTitle,
         company: entryCompany,
         duration: entryDuration,
-        achievements: this.generateAchievements(technicalSkills, responsibilities, 'junior')
+        achievements: advancedResumeOptimizer.generateAchievements(technicalSkills, responsibilities, 'junior')
       });
     }
 
