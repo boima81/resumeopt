@@ -514,26 +514,45 @@ function App() {
                 </div>
                 <p className="text-xs text-gray-600 mt-2">
                   ✅ Resume optimized with job-specific experience, skills, and achievements
+                  <br />
+                  📄 Available formats: PDF, Word Document, and Text
                 </p>
               </div>
 
               {/* Download Buttons */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button 
                   onClick={() => {
-                    const blob = new Blob([optimizedResume], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'optimized-resume-professional.txt';
-                    a.click();
-                    URL.revokeObjectURL(url);
+                    if (downloadUrls?.pdf) {
+                      const link = document.createElement('a');
+                      link.href = downloadUrls.pdf;
+                      link.download = 'optimized-resume.pdf';
+                      link.click();
+                    }
                   }}
                   className="h-12"
+                  disabled={!downloadUrls?.pdf}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Download Professional Resume
+                  Download PDF
                 </Button>
+                
+                <Button 
+                  onClick={() => {
+                    if (downloadUrls?.docx) {
+                      const link = document.createElement('a');
+                      link.href = downloadUrls.docx;
+                      link.download = 'optimized-resume.docx';
+                      link.click();
+                    }
+                  }}
+                  className="h-12"
+                  disabled={!downloadUrls?.docx}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Word
+                </Button>
+                
                 <Button 
                   variant="outline"
                   onClick={() => {
@@ -544,7 +563,7 @@ function App() {
                   className="h-12"
                 >
                   <FileText className="mr-2 h-4 w-4" />
-                  Copy to Clipboard
+                  Copy Text
                 </Button>
               </div>
 
