@@ -4,15 +4,12 @@
   "description": "AI-powered resume optimization application using Gemini AI",
   "main": "index.js",
   "scripts": {
-    "dev": "cd frontend && pnpm run dev",
-    "build": "cd frontend && pnpm run build",
-    "preview": "cd frontend && pnpm run preview",
-    "deploy": "firebase deploy",
-    "functions:dev": "cd backend/functions && npm run serve",
-    "functions:deploy": "cd backend/functions && npm run deploy",
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "preview": "cd frontend && npm run preview",
     "setup": "npm run setup:frontend && npm run setup:functions",
-    "setup:frontend": "cd frontend && pnpm install",
-    "setup:functions": "cd backend/functions && npm install"
+    "setup:frontend": "cd frontend && npm install",
+    "setup:functions": "cd netlify/functions && npm install"
   },
   "keywords": [
     "resume",
@@ -27,13 +24,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/resume-optimizer.git"
+    "url": "https://github.com/boima81/resumeopt.git"
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "devDependencies": {
-    "firebase-tools": "^13.0.0"
   }
 }
 
