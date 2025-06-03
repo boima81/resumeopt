@@ -1,6 +1,9 @@
+# Backup Netlify Configuration with legacy-peer-deps
+# Use this if --force doesn't work
+
 [build]
   publish = "frontend/dist"
-  command = "cd frontend && npm install --force && npm run build"
+  command = "cd frontend && npm install --legacy-peer-deps && npm run build"
 
 [build.environment]
   NODE_VERSION = "18"

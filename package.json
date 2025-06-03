@@ -4,7 +4,7 @@
   "description": "AI-powered resume optimization application using Gemini AI",
   "main": "index.js",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
+    "build": "cd frontend && npm install --force && npm run build",
     "dev": "cd frontend && npm run dev",
     "preview": "cd frontend && npm run preview",
     "setup": "npm run setup:frontend && npm run setup:functions",
