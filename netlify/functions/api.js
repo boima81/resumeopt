@@ -27,42 +27,182 @@ const initializeAI = () => {
 // AI-powered job analysis service
 const aiJobAnalyzer = {
   
-  // Extract job posting from URL
+  // Extract job posting from URL with enhanced anti-bot protection
   async extractFromURL(url) {
     try {
-      const response = await axios.get(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        },
-        timeout: 10000
-      });
+      console.log('Attempting to extract from URL:', url);
       
-      const $ = cheerio.load(response.data);
+      // Enhanced headers to mimic real browser
+      const headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Cache-Control': 'max-age=0'
+      };
+
+      // Try multiple extraction methods
+      const extractionMethods = [
+        // Method 1: Direct axios request
+        async () => {
+          const response = await axios.get(url, { 
+            headers,
+            timeout: 15000,
+            maxRedirects: 5,
+            validateStatus: (status) => status < 400
+          });
+          return response.data;
+        },
+        
+        // Method 2: Try with different user agent
+        async () => {
+          const altHeaders = {
+            ...headers,
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15'
+          };
+          const response = await axios.get(url, { 
+            headers: altHeaders,
+            timeout: 15000,
+            maxRedirects: 5
+          });
+          return response.data;
+        },
+        
+        // Method 3: Try with minimal headers
+        async () => {
+          const minHeaders = {
+            'User-Agent': 'Mozilla/5.0 (compatible; JobExtractor/1.0)'
+          };
+          const response = await axios.get(url, { 
+            headers: minHeaders,
+            timeout: 10000
+          });
+          return response.data;
+        }
+      ];
+
+      let html = null;
+      let lastError = null;
+
+      // Try each method until one succeeds
+      for (const method of extractionMethods) {
+        try {
+          html = await method();
+          if (html) break;
+        } catch (error) {
+          lastError = error;
+          console.log('Extraction method failed, trying next...', error.message);
+          continue;
+        }
+      }
+
+      if (!html) {
+        throw lastError || new Error('All extraction methods failed');
+      }
+
+      const $ = cheerio.load(html);
       
       // Remove script and style elements
-      $('script, style, nav, header, footer, aside').remove();
+      $('script, style, nav, header, footer, aside, .advertisement, .ads').remove();
       
-      // Extract text content
-      let jobText = $('body').text();
-      
-      // Clean up the text
-      jobText = jobText
+      // Enhanced selectors for different job sites
+      const selectors = {
+        title: [
+          'h1', '[data-testid="jobTitle"]', '.job-title', '#job-title',
+          '[class*="title"]', '[class*="heading"]', 'title'
+        ],
+        description: [
+          '[data-testid="jobDescription"]', '.job-description', '#job-description',
+          '[class*="description"]', '[class*="content"]', '.job-details',
+          'main', 'article', '.job-posting', '.job-content'
+        ]
+      };
+
+      // Detect job site and use specific selectors
+      const hostname = new URL(url).hostname.toLowerCase();
+      if (hostname.includes('ziprecruiter')) {
+        selectors.title.unshift('h1[data-testid="job-title"]', '.job_title');
+        selectors.description.unshift('.job_description', '[data-testid="jobDescriptionText"]');
+      } else if (hostname.includes('linkedin')) {
+        selectors.title.unshift('.top-card-layout__title', '.job-title');
+        selectors.description.unshift('.description__text', '.job-description');
+      } else if (hostname.includes('indeed')) {
+        selectors.title.unshift('[data-testid="jobsearch-JobInfoHeader-title"]');
+        selectors.description.unshift('[data-testid="jobsearch-jobDescriptionText"]');
+      }
+
+      // Extract title
+      let title = '';
+      for (const selector of selectors.title) {
+        const element = $(selector).first();
+        if (element.length && element.text().trim()) {
+          title = element.text().trim();
+          break;
+        }
+      }
+
+      // Extract description
+      let description = '';
+      for (const selector of selectors.description) {
+        const element = $(selector).first();
+        if (element.length && element.text().trim()) {
+          description = element.text().trim();
+          break;
+        }
+      }
+
+      // Fallback: extract all meaningful text content
+      if (!description || description.length < 100) {
+        const bodyText = $('body').text().trim();
+        if (bodyText.length > 200) {
+          description = bodyText;
+        }
+      }
+
+      // Clean up extracted text
+      let jobText = (title + '\n\n' + description)
         .replace(/\s+/g, ' ')
         .replace(/\n+/g, '\n')
         .trim();
       
+      if (!jobText || jobText.length < 50) {
+        throw new Error('Could not extract meaningful content from the URL');
+      }
+      
       return {
         success: true,
         jobText: jobText.substring(0, 10000), // Limit to 10k characters
-        source: 'url_extraction'
+        source: 'url_extraction',
+        title: title || 'Job Position'
       };
       
     } catch (error) {
       console.error('URL extraction error:', error);
+      
+      // Return helpful error message based on error type
+      let errorMessage = 'Failed to extract job posting from URL';
+      
+      if (error.response?.status === 403) {
+        errorMessage = 'This job site blocks automated access. Please copy and paste the job description text instead.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Job posting not found. Please check the URL and try again.';
+      } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        errorMessage = 'Could not connect to the job site. Please check the URL and try again.';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Request timed out. The job site may be slow or blocking requests. Please try copying the job description text instead.';
+      }
+      
       return {
         success: false,
-        error: 'Failed to extract job posting from URL',
-        fallback: true
+        error: errorMessage,
+        fallback: true,
+        suggestion: 'Copy and paste the job description text from the page instead of using the URL.'
       };
     }
   },

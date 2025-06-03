@@ -87,7 +87,12 @@ function App() {
         setProgress(50)
         setActiveStep(2)
       } else {
-        setError(data.error || 'Failed to process job posting')
+        // Handle URL extraction failures with helpful suggestions
+        if (data.fallback && data.suggestion) {
+          setError(`${data.error}\n\n💡 Suggestion: ${data.suggestion}`)
+        } else {
+          setError(data.error || 'Failed to process job posting')
+        }
       }
     } catch (error) {
       console.error('Error processing job posting:', error)
