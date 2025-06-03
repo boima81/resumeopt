@@ -1,0 +1,39 @@
+{
+  "name": "resume-optimizer",
+  "version": "1.0.0",
+  "description": "AI-powered resume optimization application using Gemini AI",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && pnpm run dev",
+    "build": "cd frontend && pnpm run build",
+    "preview": "cd frontend && pnpm run preview",
+    "deploy": "firebase deploy",
+    "functions:dev": "cd backend/functions && npm run serve",
+    "functions:deploy": "cd backend/functions && npm run deploy",
+    "setup": "npm run setup:frontend && npm run setup:functions",
+    "setup:frontend": "cd frontend && pnpm install",
+    "setup:functions": "cd backend/functions && npm install"
+  },
+  "keywords": [
+    "resume",
+    "optimization",
+    "ai",
+    "gemini",
+    "ats",
+    "job",
+    "application"
+  ],
+  "author": "Resume Optimizer Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/resume-optimizer.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  }
+}
+

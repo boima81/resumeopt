@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "demo-resume-optimizer"
+  },
+  "targets": {
+    "demo-resume-optimizer": {
+      "hosting": {
+        "frontend": [
+          "demo-resume-optimizer"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
+
