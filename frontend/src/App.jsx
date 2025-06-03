@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
+import { generatePDF } from '@/lib/pdf-generator'
 import { Textarea } from '@/components/ui/textarea.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
@@ -176,11 +177,9 @@ function App() {
       const data = await response.json()
       
       clearInterval(progressInterval)
-      
-      if (data.success) {
+        if (data.success) {
         setOptimizedResume(data.optimizedResume)
         setDownloadUrls({
-          pdf: data.downloads?.pdf,
           docx: data.downloads?.docx,
           text: data.downloads?.text
         })
@@ -196,7 +195,6 @@ function App() {
       setLoading(false)
     }
   }
-
   // Reset function
   const handleReset = () => {
     setActiveStep(1)
@@ -209,6 +207,7 @@ function App() {
     setDownloadUrls(null)
     setError('')
     setProgress(0)
+    setLoading(false)
   }
 
   return (
@@ -447,18 +446,16 @@ function App() {
                 </div>
 
                 {/* Download Buttons */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button 
-                    onClick={() => {
-                      if (downloadUrls?.pdf) {
-                        const link = document.createElement('a');
-                        link.href = downloadUrls.pdf;
-                        link.download = 'optimized-resume.pdf';
-                        link.click();
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">                  <Button 
+                    onClick={async () => {
+                      try {
+                        const pdf = await generatePDF(optimizedResume);
+                        pdf.save('optimized-resume.pdf');
+                      } catch (error) {
+                        setError('Failed to generate PDF. Please try again.');
                       }
                     }}
                     className="h-12"
-                    disabled={!downloadUrls?.pdf}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download PDF

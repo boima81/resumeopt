@@ -1,0 +1,46 @@
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+export const generatePDF = async (resumeText) => {
+  try {
+    // Create a temporary div to render the resume content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = `
+      <div style="font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
+        <h1 style="color: #2E86AB; font-size: 24px; margin-bottom: 20px; text-align: center;">Optimized Resume</h1>
+        <div style="white-space: pre-wrap; font-size: 12px; line-height: 1.5;">
+          ${resumeText}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(tempDiv);
+
+    // Convert the div to canvas
+    const canvas = await html2canvas(tempDiv, {
+      scale: 2,
+      logging: false,
+      useCORS: true
+    });
+
+    // Remove the temporary div
+    document.body.removeChild(tempDiv);
+
+    // Create PDF
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+
+    return pdf;
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw new Error('Failed to generate PDF');
+  }
+};
