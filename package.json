@@ -11,6 +11,9 @@
     "setup:frontend": "cd frontend && npm install",
     "setup:functions": "cd netlify/functions && npm install"
   },
+  "dependencies": {
+    "lambda-multipart-parser": "^1.0.1"
+  },
   "keywords": [
     "resume",
     "optimization",
