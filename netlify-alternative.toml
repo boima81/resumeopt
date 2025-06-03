@@ -1,0 +1,24 @@
+# Alternative Netlify Configuration
+# Use this if the main netlify.toml doesn't work
+
+[build]
+  publish = "frontend/dist"
+  command = "cd frontend && rm -rf node_modules package-lock.json && npm install --legacy-peer-deps && npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[functions]
+  directory = "netlify/functions"
+
