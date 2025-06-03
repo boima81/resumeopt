@@ -37,8 +37,8 @@ function App() {
   const [error, setError] = useState('')
   const [progress, setProgress] = useState(0)
 
-  // API base URL - will be updated for production
-  const API_BASE = 'http://127.0.0.1:5001/demo-resume-optimizer/us-central1/api'
+  // API base URL - updated for Netlify deployment
+  const API_BASE = '/.netlify/functions/api'
 
   // Handle job posting input
   const handleJobSubmit = async () => {

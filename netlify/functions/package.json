@@ -1,0 +1,10 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Resume Optimizer",
+  "main": "api.js",
+  "dependencies": {
+    "lambda-multipart-parser": "^1.0.1"
+  }
+}
+
