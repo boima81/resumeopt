@@ -326,20 +326,39 @@ function App() {
 
               {jobData && (
                 <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-2 mb-3">
                     <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">Job posting processed successfully</span>
+                    <span className="text-sm font-medium text-green-800">Job Analysis Complete</span>
                   </div>
-                  <div className="space-y-2">
-                    <p className="text-xs text-green-700">Key requirements identified:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {jobData.keyRequirements?.slice(0, 3).map((req, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {req.substring(0, 30)}...
+                  
+                  {jobData.analysis && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs font-medium text-green-700 mb-1">Job Title:</p>
+                        <Badge variant="secondary" className="text-xs">{jobData.analysis.jobTitle}</Badge>
+                      </div>
+                      
+                      <div>
+                        <p className="text-xs font-medium text-green-700 mb-1">Technical Skills Required:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {jobData.analysis.technicalSkills?.slice(0, 6).map((skill, index) => (
+                            <Badge key={index} variant="outline" className="text-xs capitalize">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="secondary" className="text-xs capitalize">
+                          {jobData.analysis.industry} Industry
                         </Badge>
-                      ))}
+                        <Badge variant="secondary" className="text-xs">
+                          {jobData.analysis.yearsRequired}+ Years
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -480,41 +499,52 @@ function App() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Preview */}
+              {/* Enhanced Preview */}
               <div>
-                <Label className="text-base font-medium">Preview</Label>
-                <div className="mt-2 p-4 bg-gray-50 rounded-lg border max-h-64 overflow-y-auto">
-                  <pre className="text-sm whitespace-pre-wrap font-sans">
-                    {optimizedResume.substring(0, 500)}...
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-base font-medium">Optimized Resume Preview</Label>
+                  <Badge variant="secondary" className="text-xs">
+                    ✨ Job-Matched Content
+                  </Badge>
+                </div>
+                <div className="mt-2 p-6 bg-white rounded-lg border shadow-sm max-h-80 overflow-y-auto">
+                  <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed text-gray-800">
+                    {optimizedResume}
                   </pre>
                 </div>
+                <p className="text-xs text-gray-600 mt-2">
+                  ✅ Resume optimized with job-specific experience, skills, and achievements
+                </p>
               </div>
 
               {/* Download Buttons */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button 
-                  onClick={() => window.open(downloadUrls?.docx, '_blank')}
-                  className="h-12"
-                  disabled={!downloadUrls?.docx}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download DOCX
-                </Button>
-                <Button 
-                  variant="outline"
                   onClick={() => {
                     const blob = new Blob([optimizedResume], { type: 'text/plain' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'optimized-resume.txt';
+                    a.download = 'optimized-resume-professional.txt';
                     a.click();
                     URL.revokeObjectURL(url);
                   }}
                   className="h-12"
                 >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Professional Resume
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    // Create a formatted version for copying
+                    navigator.clipboard.writeText(optimizedResume);
+                    // You could add a toast notification here
+                  }}
+                  className="h-12"
+                >
                   <FileText className="mr-2 h-4 w-4" />
-                  Download Text
+                  Copy to Clipboard
                 </Button>
               </div>
 
