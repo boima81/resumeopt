@@ -48,9 +48,20 @@ function parseResumeText(text) {
 
 export async function generatePDF(resumeText) {
   try {
+    // Create a temporary div to render the resume content
     const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '0';
+    tempDiv.style.width = '794px'; // A4 width at 96dpi
+    tempDiv.style.height = '1123px'; // A4 height at 96dpi
+    tempDiv.style.background = '#fff';
+    tempDiv.style.zIndex = '10000';
+    tempDiv.style.overflow = 'visible';
+
+    // Parse the resume text into sections
     const sections = parseResumeText(resumeText);
-    
+
     tempDiv.innerHTML = `
       <div style="font-family: 'Arial', sans-serif; padding: 25mm; max-width: 210mm; margin: 0 auto; background: rgb(255, 255, 255); color: rgb(35, 35, 35);">
         <!-- Header Section -->
@@ -100,36 +111,34 @@ export async function generatePDF(resumeText) {
         ` : ''}
       </div>
     `;
-    
+
     document.body.appendChild(tempDiv);
-    
+    // Wait for the browser to render the element
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    // Convert the div to canvas with optimized settings for color compatibility
     const canvas = await html2canvas(tempDiv, {
-      scale: 3,
+      scale: 2,
       logging: false,
       useCORS: true,
-      removeContainer: true,
       backgroundColor: '#ffffff',
-      foreignObjectRendering: false,
       letterRendering: true,
-      allowTaint: false,
-      imageTimeout: 0,
-      windowWidth: 1024
+      windowWidth: 794,
+      windowHeight: 1123
     });
 
+    // Remove the temporary div
     document.body.removeChild(tempDiv);
 
+    // Create PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
+      unit: 'px',
+      format: [794, 1123]
     });
 
     const imgData = canvas.toDataURL('image/png');
-    const width = pdf.internal.pageSize.getWidth();
-    const height = (canvas.height * width) / canvas.width;
-
-    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-    
+    pdf.addImage(imgData, 'PNG', 0, 0, 794, 1123);
     return pdf;
   } catch (error) {
     console.error('Error generating PDF:', error);
